@@ -211,3 +211,30 @@ if ( !is_admin() ) {
 }
 */
 
+
+/**
+ * Exclude displayed posts from Display Posts
+ * @see https://displayposts.com/2019/01/03/exclude-posts-already-displayed/
+ */
+function be_dps_exclude_displayed_posts( $args ) {
+  global $dps_excluded_posts;
+  if( ! is_array( $dps_excluded_posts ) )
+      $dps_excluded_posts = [];
+  $args['post__not_in'] = !empty( $args['post__not_in'] ) ? array_merge( $args['post__not_in'], $dps_excluded_posts ) : $dps_excluded_posts;
+  return $args;
+}
+add_filter( 'display_posts_shortcode_args', 'be_dps_exclude_displayed_posts' );
+
+/**
+ * Add DPS posts to exclusion list 
+ * @see https://displayposts.com/2019/01/03/exclude-posts-already-displayed/
+ */
+function be_dps_add_posts_to_exclusion_list( $output ) {
+  global $dps_excluded_posts;
+  if( ! is_array( $dps_excluded_posts ) )
+      $dps_excluded_posts = [];
+  $dps_excluded_posts[] = get_the_ID();
+  return $output;
+}
+add_filter( 'display_posts_shortcode_output', 'be_dps_add_posts_to_exclusion_list' );
+
